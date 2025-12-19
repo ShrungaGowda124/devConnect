@@ -1,0 +1,17 @@
+{
+  "name": "devtinder",
+  "version": "1.0.0",
+  "description": "tinder app for developers",
+  "license": "ISC",
+  "author": "Shrunga V S",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "nodemon": "^3.1.11"
+  }
+}
