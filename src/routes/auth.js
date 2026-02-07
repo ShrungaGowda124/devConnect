@@ -1,16 +1,36 @@
-const express = require('express')
-const router = express.Router()
+const express = require("express");
+const router = express.Router();
 const bcrypt = require("bcrypt");
-const validateSignupData = require("../utils/helpers");
+const { validateSignupData } = require("../utils/helpers");
 const User = require("../models/user");
 const saltRounds = 10;
 
 router.post("/signup", async (req, res) => {
   try {
     validateSignupData(req.body);
-    const { firstName, lastName, emailId, password } = req.body;
+    const {
+      firstName,
+      lastName,
+      emailId,
+      password,
+      age,
+      gender,
+      about,
+      skills,
+    } = req.body;
     //Encrypt the password
     const hashPassword = await bcrypt.hash(password, saltRounds);
+    console.log({
+      firstName,
+      lastName,
+      emailId,
+      password: hashPassword,
+      age,
+      gender,
+      about,
+      skills,
+    });
+    
 
     //   Creating new instance of User model
     const user = new User({
@@ -18,6 +38,10 @@ router.post("/signup", async (req, res) => {
       lastName,
       emailId,
       password: hashPassword,
+      age,
+      gender,
+      about,
+      skills,
     });
     await user.save();
     res.send("User added successfully");
@@ -29,7 +53,9 @@ router.post("/signup", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { emailId, password } = req.body;
+
     const user = await User.findOne({ emailId: emailId });
+    console.log(user);
 
     if (!user) {
       throw new Error("Incorrect credentials");
@@ -39,19 +65,26 @@ router.post("/login", async (req, res) => {
     if (isCorrectPassword) {
       // create a jwt token
       let token = await user.getJWT();
-      console.log(token);
+      // console.log(token);
 
       // add the token to cookie and send the response back to the user
       res.cookie("token", token, {
         expires: new Date(Date.now() + 8 * 3600000), // cookie will be removed after 8 hours
       });
-      res.send("Login successful");
+      res.send(user);
     } else {
       throw new Error("Incorrect credentials");
     }
   } catch (err) {
     res.status(400).send("ERROR: " + err.message);
   }
+});
+
+router.post("/logout", async (req, res) => {
+  res.cookie("token", null, {
+    expires: new Date(Date.now()),
+  });
+  res.send("Logout successful");
 });
 
 module.exports = router;
