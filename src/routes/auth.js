@@ -20,17 +20,6 @@ router.post("/signup", async (req, res) => {
     } = req.body;
     //Encrypt the password
     const hashPassword = await bcrypt.hash(password, saltRounds);
-    console.log({
-      firstName,
-      lastName,
-      emailId,
-      password: hashPassword,
-      age,
-      gender,
-      about,
-      skills,
-    });
-    
 
     //   Creating new instance of User model
     const user = new User({
@@ -65,10 +54,10 @@ router.post("/login", async (req, res) => {
     if (isCorrectPassword) {
       // create a jwt token
       let token = await user.getJWT();
-      // console.log(token);
 
       // add the token to cookie and send the response back to the user
       res.cookie("token", token, {
+        httpOnly: true,
         expires: new Date(Date.now() + 8 * 3600000), // cookie will be removed after 8 hours
       });
       res.send(user);
